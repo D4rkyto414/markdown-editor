@@ -1,1 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-gray-100 flex flex-col h-screen">
+    <header class="bg-blue-500 text-white p-4 text-center fixed top-0 w-full">
+        <button id="previewBtn" class="bg-white text-blue-500 px-4 py-2 rounded">Generar Vista Previa</button>
+        <button id="contrastBtn" class="bg-white text-blue-500 px-4 py-2 rounded ml-2">Contrastar Encabezados</button>
+    </header>
+    
+    <main class="flex flex-grow pt-16 p-4">
+        <textarea id="editor" class="w-1/2 p-2 border rounded" placeholder="Escribe en Markdown..."></textarea>
+        <div id="preview" class="w-1/2 p-2 border rounded bg-white overflow-auto"></div>
+    </main>
+</body>
+<script src="js/app.js"></script>
+</html>
 
