@@ -1,24 +1,53 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const editor = document.getElementById("editor");
-    const preview = document.getElementById("preview");
-    const previewBtn = document.getElementById("previewBtn");
-    const contrastBtn = document.getElementById("contrastBtn");
+// Importar módulos
+import { toggleFormat } from "./format.js";
+import { convertToList } from "./lists.js";
+import { highlightCode } from "./blocks.js";
 
-    previewBtn.addEventListener("click", () => {
-        let markdownText = editor.value;
-        let htmlText = markdownText
-            .replace(/^# (.*$)/gm, "<h1>$1</h1>")
-            .replace(/^## (.*$)/gm, "<h2>$1</h2>")
-            .replace(/^### (.*$)/gm, "<h3>$1</h3>")
-            .replace(/^- (.*$)/gm, "<ul><li>$1</li></ul>");
-        preview.innerHTML = htmlText;
-    });
+// Elementos del DOM
+const editor = document.getElementById("editor");
+const previewBtn = document.getElementById("preview-btn");
+const formatBtn = document.getElementById("format-btn");
+const preview = document.getElementById("preview");
 
-    contrastBtn.addEventListener("click", () => {
-        document.querySelectorAll("#preview h1, #preview h2, #preview h3").forEach(el => {
-            el.classList.toggle("text-red-500");
-            el.classList.toggle("text-xl");
-        });
-    });
+// Evento para aplicar formato
+toggleFormat(formatBtn, editor);
+
+// Evento para generar vista previa
+previewBtn.addEventListener("click", () => {
+    let content = editor.value;
+    content = convertToList(content);
+    content = highlightCode(content);
+    preview.innerHTML = content;
 });
+
+// js/format.js
+export function toggleFormat(button, editor) {
+    button.addEventListener("click", () => {
+        const selectedText = editor.value.substring(editor.selectionStart, editor.selectionEnd);
+        if (!selectedText) return;
+        const isBold = selectedText.startsWith("**") && selectedText.endsWith("**");
+        const isItalic = selectedText.startsWith("*") && selectedText.endsWith("*");
+
+        let formattedText;
+        if (isBold) {
+            formattedText = selectedText.slice(2, -2);
+        } else if (isItalic) {
+            formattedText = selectedText.slice(1, -1);
+        } else {
+            formattedText = `**${selectedText}**`;
+        }
+        editor.setRangeText(formattedText);
+    });
+}
+
+// js/lists.js
+export function convertToList(content) {
+    return content.replace(/(\d+)\.\s(.+)/g, "<li>$2</li>").replace(/(<li>.*<\/li>)/g, "<ol>$1</ol>");
+}
+
+// js/blocks.js
+export function highlightCode(content) {
+    return content.replace(/```([\s\S]+?)```/g, '<pre><code>$1</code></pre>');
+}
+
 
