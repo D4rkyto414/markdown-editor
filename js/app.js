@@ -1,24 +1,36 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const editor = document.getElementById("editor");
-    const preview = document.getElementById("preview");
-    const previewBtn = document.getElementById("previewBtn");
-    const contrastBtn = document.getElementById("contrastBtn");
-
-    previewBtn.addEventListener("click", () => {
-        let markdownText = editor.value;
-        let htmlText = markdownText
-            .replace(/^# (.*$)/gm, "<h1>$1</h1>")
-            .replace(/^## (.*$)/gm, "<h2>$1</h2>")
-            .replace(/^### (.*$)/gm, "<h3>$1</h3>")
-            .replace(/^- (.*$)/gm, "<ul><li>$1</li></ul>");
-        preview.innerHTML = htmlText;
-    });
-
-    contrastBtn.addEventListener("click", () => {
-        document.querySelectorAll("#preview h1, #preview h2, #preview h3").forEach(el => {
-            el.classList.toggle("text-red-500");
-            el.classList.toggle("text-xl");
-        });
-    });
+document.getElementById('fileInput').addEventListener('change', async function (event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const loadingIndicator = document.getElementById('loading');
+    loadingIndicator.style.display = 'block';
+    
+    try {
+        const content = await readFileAsText(file);
+        document.getElementById('editor').value = content;
+        updatePreview(content);
+    } catch (error) {
+        alert('Error al leer el archivo: ' + error.message);
+    } finally {
+        loadingIndicator.style.display = 'none';
+    }
 });
+
+function readFileAsText(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('No se pudo leer el archivo.'));
+        reader.readAsText(file);
+    });
+}
+
+// Función para actualizar la vista previa
+function updatePreview(content) {
+    try {
+        document.getElementById('preview').innerHTML = marked.parse(content);
+    } catch (error) {
+        document.getElementById('preview').innerHTML = '<p style="color: red;">Error en la sintaxis Markdown</p>';
+    }
+}
 
