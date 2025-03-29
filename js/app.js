@@ -1,24 +1,39 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const editor = document.getElementById("editor");
-    const preview = document.getElementById("preview");
-    const previewBtn = document.getElementById("previewBtn");
-    const contrastBtn = document.getElementById("contrastBtn");
+// Seleccionar elementos del DOM
+const editor = document.getElementById("editor");
+const preview = document.getElementById("preview");
+const clearButton = document.getElementById("clear-button");
+const wordCount = document.getElementById("word-count");
+const charCount = document.getElementById("char-count");
+const themeSelector = document.getElementById("theme-selector");
 
-    previewBtn.addEventListener("click", () => {
-        let markdownText = editor.value;
-        let htmlText = markdownText
-            .replace(/^# (.*$)/gm, "<h1>$1</h1>")
-            .replace(/^## (.*$)/gm, "<h2>$1</h2>")
-            .replace(/^### (.*$)/gm, "<h3>$1</h3>")
-            .replace(/^- (.*$)/gm, "<ul><li>$1</li></ul>");
-        preview.innerHTML = htmlText;
-    });
+// Función para actualizar la vista previa
+toggleTheme(localStorage.getItem("theme") || "light");
 
-    contrastBtn.addEventListener("click", () => {
-        document.querySelectorAll("#preview h1, #preview h2, #preview h3").forEach(el => {
-            el.classList.toggle("text-red-500");
-            el.classList.toggle("text-xl");
-        });
-    });
+editor.addEventListener("input", () => {
+  preview.innerHTML = marked.parse(editor.value);
+  updateCounter();
 });
 
+// Función para limpiar editor y preview
+clearButton.addEventListener("click", () => {
+  editor.value = "";
+  preview.innerHTML = "";
+  updateCounter();
+});
+
+// Función para actualizar contador de palabras y caracteres
+function updateCounter() {
+  const text = editor.value.trim();
+  wordCount.textContent = text.length ? text.split(/\s+/).length : 0;
+  charCount.textContent = text.length;
+}
+
+// Función para cambiar el tema
+themeSelector.addEventListener("change", (e) => {
+  toggleTheme(e.target.value);
+});
+
+function toggleTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("theme", theme);
+}
